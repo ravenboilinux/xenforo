@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addon addon_id="autocraft_game_profile" title="AutoCraft Heros RPG Game Profiles" version_string="1.0.0.0" version_id="1000" url="http://autoherosrpg.com/" install_callback_class="autocraft_Install" install_callback_method="install" uninstall_callback_class="autocraft_Install" uninstall_callback_method="uninstall">
+  <admin_navigation>
+    <navigation navigation_id="autocraft" parent_navigation_id="applications" display_order="10" link="games" admin_permission_id="autocraft_Manage_Games" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="autocraft_game" parent_navigation_id="autocraft" display_order="1" link="games" admin_permission_id="autocraft_Manage_Games" debug_only="0" hide_no_children="0"/>
+  </admin_navigation>
+  <admin_permissions>
+    <admin_permission admin_permission_id="autocraft_Create_Games" display_order="1"/>
+    <admin_permission admin_permission_id="autocraft_Manage_Games" display_order="10"/>
+  </admin_permissions>
+  <admin_style_properties/>
+  <admin_templates>
+    <template title="autocraft_game_add"><![CDATA[<xen:title>{xen:if {$game.game_id}, '{xen:phrase edit_game}: {$game.title}', '{xen:phrase create_new_game}'}</xen:title>
+<xen:if is="{$game.game_id}">
+	<xen:navigation>
+		<xen:breadcrumb href="{xen:adminlink games}#{xen:helper listitemid, $game.game_id}">{$game.title}</xen:breadcrumb>
+	</xen:navigation>
+</xen:if>
+<xen:h1>
+	<xen:if is="{$game.game_id}">
+		{xen:phrase edit_game}: {$game.title}
+	<xen:else />
+		{xen:phrase create_game}
+	</xen:if>
+	
+		
+</xen:h1>
+
+<xen:form action="{xen:adminlink 'games/save', $game}" class="AutoValidator" data-fieldvalidatorurl="{xen:adminlink 'games/validate-field', $game}" data-redirect="yes"> 
+
+	<xen:textboxunit name="title" value="{$game.title}" label="{xen:phrase game_title}:">
+			<xen:explain>{xen:phrase explain_game_title}</xen:explain>
+	</xen:textboxunit>
+
+	<xen:textboxunit name="description" value="{$game.description}" label="{xen:phrase game_description}:">
+			<xen:explain>{xen:phrase explain_game_description}</xen:explain>
+	</xen:textboxunit>
+	<xen:submitunit save="{xen:phrase save}" />
+
+</xen:form>]]></template>
+    <template title="autocraft_game_list"><![CDATA[<xen:title>{xen:phrase game_tree}</xen:title>
+
+<xen:topctrl>
+	<a href="{xen:adminlink 'games/add'}" class="button" accesskey="a">+ {xen:phrase create_new_game}</a>
+</xen:topctrl>
+
+<xen:require css="filter_list.css" />
+<xen:require js="js/xenforo/filter_list.js" />
+<xen:form action="{xen:adminlink games}" class="section">
+	<xen:if is="{$current_games}">
+		<h2 class="subHeading">
+			<xen:include template="filter_list_controls" />
+			{xen:phrase games}
+		</h2>
+		<xen:set var="$gameCount">{xen:count $current_games, false}</xen:set>
+		<ol class="FilterList Scrollable">
+			<xen:foreach loop="$current_games" value="$game">
+				<xen:listitem
+					id="{$game.game_id}"
+					label="{$game.title}"
+					snippet="{$game.description}"
+					href="{xen:adminlink 'games/edit', $game}"
+					delete="{xen:adminlink 'games/delete', $game}">
+					<xen:html>
+						<a href="{xen:adminlink 'game', $game}" class="secondaryContent {xen:if {$hasGameProfile}, 'hasPermissions'}">{xen:phrase game_profiles}</a>
+					</xen:html>
+				</xen:listitem>
+			</xen:foreach>
+		</ol>
+		<p class="sectionFooter">{xen:phrase showing_x_of_y_items, 'count=<span class="FilterListCount">{xen:count $current_games}</span>', 'total={xen:count $current_games}'}</p>
+	<xen:else />
+		<div class="noResults">{xen:phrase there_no_games_defined}</div>
+	</xen:if>
+</xen:form>]]></template>
+    <template title="autocraft_game_profile_list"><![CDATA[<xen:title>{xen:phrase game_profile}</xen:title>
+
+<xen:topctrl>
+	<a href="{xen:adminlink 'game-profile/add'}" class="button" accesskey="a">+ {xen:phrase create_new_game_profile}</a>
+</xen:topctrl>
+
+<xen:require css="filter_list.css" />
+<xen:require js="js/xenforo/filter_list.js" />
+<xen:form action="{xen:adminlink game-profile}" class="section">
+	<xen:if is="{$profiles}">
+		<h2 class="subHeading">
+			<xen:include template="filter_list_controls" />
+			{xen:phrase game_profile}
+		</h2>
+		<xen:set var="$gameCount">{xen:count $profiles, false}</xen:set>
+		<ol class="FilterList Scrollable">
+			<xen:foreach loop="$profiles" value="$game">
+				<xen:listitem
+					id="{$game.game_id}"
+					label="{$game.title}"
+					snippet="{$game.description}"
+					href="{xen:adminlink 'game-profile/edit', $game}"
+					delete="{xen:adminlink 'game-profile/delete', $game}">
+				</xen:listitem>
+			</xen:foreach>
+		</ol>
+		<p class="sectionFooter">{xen:phrase showing_x_of_y_items, 'count=<span class="FilterListCount">{xen:count $profiles}</span>', 'total={xen:count $profiles}'}</p>
+	<xen:else />
+		<div class="noResults">{xen:phrase there_no_game_profile_defined}</div>
+	</xen:if>
+</xen:form>]]></template>
+  </admin_templates>
+  <admin_template_modifications/>
+  <code_events/>
+  <code_event_listeners>
+    <listener event_id="template_create" execute_order="10" callback_class="autocraft_Listener" callback_method="template_create" active="1" hint="" description="Template create hook to preload custom templates"/>
+    <listener event_id="template_hook" execute_order="10" callback_class="autocraft_Listener" callback_method="template_hook" active="1" hint="" description="Template create hook to preload custom templates"/>
+  </code_event_listeners>
+  <cron/>
+  <email_templates/>
+  <email_template_modifications/>
+  <optiongroups/>
+  <permissions>
+    <permission_groups/>
+    <permissions/>
+    <interface_groups/>
+  </permissions>
+  <phrases>
+    <phrase title="admin_navigation_autocraft" version_id="1000" version_string="1.0.0.0"><![CDATA[AutoCraft Game]]></phrase>
+    <phrase title="admin_navigation_autocraft_game" version_id="1000" version_string="1.0.0.0"><![CDATA[View Games]]></phrase>
+    <phrase title="admin_permission_autocraft_Create_Games" version_id="1000" version_string="1.0.0.0"><![CDATA[AutoCraft Create New Games]]></phrase>
+    <phrase title="admin_permission_autocraft_Manage_Games" version_id="1000" version_string="1.0.0.0"><![CDATA[AutoCraft Manage Games]]></phrase>
+    <phrase title="autocraft_game_profile_tab_name" version_id="1000" version_string="1.0.0.0"><![CDATA[Game Profiles]]></phrase>
+    <phrase title="create_game" version_id="1000" version_string="1.0.0.0"><![CDATA[Create Game]]></phrase>
+    <phrase title="create_new_game" version_id="1000" version_string="1.0.0.0"><![CDATA[Create New Game]]></phrase>
+    <phrase title="create_new_game_profile" global_cache="1" version_id="1000" version_string="1.0.0.0"><![CDATA[Create New Game Profile]]></phrase>
+    <phrase title="edit_game" global_cache="1" version_id="1000" version_string="1.0.0.0"><![CDATA[Edit Game]]></phrase>
+    <phrase title="explain_game_description" version_id="1000" version_string="1.0.0.0"><![CDATA[Description of the game]]></phrase>
+    <phrase title="explain_game_title" version_id="1000" version_string="1.0.0.0"><![CDATA[Title of The Game]]></phrase>
+    <phrase title="games" version_id="1000" version_string="1.0.0.0"><![CDATA[Games]]></phrase>
+    <phrase title="game_description" version_id="1000" version_string="1.0.0.0"><![CDATA[Description]]></phrase>
+    <phrase title="game_profile" version_id="1000" version_string="1.0.0.0"><![CDATA[Gaming Profile]]></phrase>
+    <phrase title="game_profiles" global_cache="1" version_id="1000" version_string="1.0.0.0"><![CDATA[Gaming Profiles]]></phrase>
+    <phrase title="game_title" version_id="1000" version_string="1.0.0.0"><![CDATA[Title]]></phrase>
+    <phrase title="game_tree" version_id="1000" version_string="1.0.0.0"><![CDATA[Games]]></phrase>
+    <phrase title="requested_ac_game_not_found" version_id="1000" version_string="1.0.0.0"><![CDATA[Game Not Found.]]></phrase>
+    <phrase title="there_no_games_defined" version_id="1000" version_string="1.0.0.0"><![CDATA[There are no games defined.]]></phrase>
+    <phrase title="there_no_game_profile_defined" global_cache="1" version_id="1000" version_string="1.0.0.0"><![CDATA[There are no Game Profile for this game]]></phrase>
+  </phrases>
+  <route_prefixes>
+    <route_type type="admin">
+      <prefix original_prefix="games" class="autocraft_Route_PrefixAdmin_Game" build_link="all"/>
+    </route_type>
+  </route_prefixes>
+  <style_properties/>
+  <templates>
+    <template title="autocraft_GameProfile" version_id="1000" version_string="1.0.0.0"><![CDATA[<xen:require css="search_results.css" /><div id="notes">test game</div>]]></template>
+    <template title="autocraft_GameProfiles" version_id="0" version_string=""><![CDATA[<li id="ourTab" class="profileContent">
+      <div class="section">This is the content of our tab</div>
+</li>]]></template>
+    <template title="autocraft_GameProfilesTab" version_id="1000" version_string="1.0.0.0"><![CDATA[<xen:if is="{$visitor.is_admin} OR {$visitor.is_moderator}">
+	<li>
+		<a href="{$requestPaths.requestUri}#notes">{xen:phrase autocraft_game_profile_tab_name}</a>
+	</li>
+</xen:if>]]></template>
+  </templates>
+  <public_template_modifications/>
+  <bb_code_media_sites/>
+  <bb_codes/>
+</addon>
